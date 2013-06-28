@@ -28,7 +28,7 @@ struct
   let head s =
     match s with
         [] -> raise Empty
-          x::_ -> x
+      | x::_ -> x
   let tail s =
     match s with
         [] -> raise Empty
@@ -91,7 +91,7 @@ sig
   type t
   val compare : t -> t -> int
 end
-  
+
 (* SET Signature *)
 
 module type SET =
@@ -116,7 +116,7 @@ struct
         EmptyTree -> Node(EmptyTree, x, EmptyTree)
       | Node(left, k, right) ->
         match Element.compare x k with
-            0 -> Node(EmptyTree, x, EmptyTree)
+            0 -> s
           | n when n < 0 -> Node(insert x left, k, right)
           | _ -> Node(left, k, insert x right)
   let rec member x s =
@@ -127,4 +127,42 @@ struct
             0 -> true
           | n when n < 0 -> member x left
           | _ -> member x right
+end
+
+(* Exercise 2.2 *)
+
+module type TWOWAY_ORDERED =
+  sig
+    type t
+    val lt : t -> t -> bool
+    val eq : t -> t -> bool
+  end
+
+module UnbalancedTwoWaySet (Element : TWOWAY_ORDERED) : SET =
+struct
+  type elem = Element.t
+  type tree = EmptyTree | Node of tree * elem * tree
+  type set = tree
+  let empty = EmptyTree
+  let rec insert x s =
+    match s with
+        EmptyTree -> Node(EmptyTree, x, EmptyTree)
+      | Node(left, k, right) ->
+        if Element.lt x k then Node(insert x left, k, right)
+        else if Element.eq x k then s
+        else Node(left, k, insert x right)
+  let rec member x s =
+    let rec member' x s cand =
+      match x, s with
+          x, EmptyTree -> if x = cand then true else false
+        | x, Node(left, k, right) ->
+          if Element.lt x k
+          then member' x left cand
+          else member' x right k
+    in match x, s with
+        _, EmptyTree -> false
+      | x, Node(left, k, right) ->
+        if Element.lt x k
+        then member x left
+        else member' x right k
 end
