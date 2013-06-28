@@ -1,25 +1,26 @@
 (* Chapter 2 *)
 
-exception Empty
-exception Subscript
-
 (* STACK signature *)
 module type STACK =
 sig
   type 'a stack
+  exception Empty
+  exception Subscript
   val empty : 'a stack
   val is_empty : 'a stack -> bool
   val cons : 'a -> 'a stack -> 'a stack
-  val head : 'a stack -> 'a
-  val tail : 'a stack -> 'a stack
+  val head : 'a stack -> 'a (* Raises Empty *)
+  val tail : 'a stack -> 'a stack (* Raises Empty *)
   val concat : 'a stack -> 'a stack -> 'a stack
-  val update : 'a stack -> int -> 'a -> 'a stack
+  val update : 'a stack -> int -> 'a -> 'a stack (* Raises Subscript *)
 end
 
 (* Stack struct *)
 module ListStack : STACK =
 struct
   type 'a stack = 'a list
+  exception Empty
+  exception Subscript
   let empty = []
   let is_empty s =
     s = []
@@ -49,6 +50,8 @@ struct
   type 'a stack =
       Nil
     | Cons of 'a * 'a stack
+  exception Empty
+  exception Subscript
   let empty = Nil
   let is_empty s =
     match s with
