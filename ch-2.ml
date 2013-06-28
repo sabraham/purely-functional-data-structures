@@ -21,8 +21,7 @@ module ListStack : STACK =
 struct
   type 'a stack = 'a list
   let empty = []
-  let is_empty s =
-    s = []
+  let is_empty = function [] -> true | _ -> false
   let cons x s =
     x :: s
   let head s =
@@ -38,10 +37,10 @@ struct
         [] -> ys
       | xh::xt -> xh::(concat xt ys)
   let rec update s i v =
-    match s with
-        [] -> raise Empty
-      | x::xs ->
-        if i = 0 then v::xs else x::(update xs (i - 1) v)
+    match i, s with
+        _, [] -> raise Empty
+      | 0, x::xs -> v::xs
+      | i, x::xs -> x::(update xs (i - 1) v)
 end
 
 module CustomStack : STACK =
