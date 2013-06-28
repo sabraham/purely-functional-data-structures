@@ -67,8 +67,8 @@ struct
   let rec update s i v =
     match s with
         Nil -> raise Subscript
-      | Cons(x, xs) ->
-        if i = 0 then Cons(v, xs) else Cons(x, (update xs (i - 1) v))
+      | Cons(x, xs) when i = 0 -> Cons(v, xs)
+      | Cons(x, xs) -> Cons(x, (update xs (i - 1) v))
 end
 
 (* Exercise 2.1 *)
