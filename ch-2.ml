@@ -82,10 +82,12 @@ let suffixes xs =
 
 (* ORDERED Signature *)
 
+type order = Less | Greater | Equal
+
 module type ORDERED =
 sig
   type t
-  val compare : t -> t -> int
+  val compare : t -> t -> order
 end
 
 (* SET Signature *)
@@ -112,17 +114,17 @@ struct
         EmptyTree -> Node(EmptyTree, x, EmptyTree)
       | Node(left, k, right) ->
         match Element.compare x k with
-            0 -> s
-          | n when n < 0 -> Node(insert x left, k, right)
-          | _ -> Node(left, k, insert x right)
+            Equal   -> s
+          | Less    -> Node(insert x left, k, right)
+          | Greater -> Node(left, k, insert x right)
   let rec member x s =
     match s with
         EmptyTree -> false
       | Node(left, k, right) ->
         match Element.compare x k with
-            0 -> true
-          | n when n < 0 -> member x left
-          | _ -> member x right
+            Equal   -> true
+          | Less    -> member x left
+          | Greater -> member x right
 end
 
 (* Exercise 2.2 *)
@@ -138,9 +140,9 @@ struct
         EmptyTree -> Node(EmptyTree, x, EmptyTree)
       | Node(left, k, right) ->
         match Element.compare x k with
-          0            -> s
-        | n when n < 0 -> Node(insert x left, k, right)
-        | _            -> Node(left, k, insert x right)
+          Equal   -> s
+        | Less    -> Node(insert x left, k, right)
+        | Greater -> Node(left, k, insert x right)
 
   let rec member x s =
     let rec member' x s cand =
@@ -148,12 +150,12 @@ struct
           x, EmptyTree -> if x = cand then true else false
         | x, Node(left, k, right) ->
           match Element.compare x k with
-            n when n < 0 -> member' x left cand
-          | _            -> member' x right k
+            Less -> member' x left cand
+          | _    -> member' x right k
     in match x, s with
         _, EmptyTree -> false
       | x, Node(left, k, right) ->
         match Element.compare x k with
-          n when n < 0 -> member x left
-        | _            -> member' x right k
+          Less -> member x left
+        | _    -> member' x right k
 end
