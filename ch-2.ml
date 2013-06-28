@@ -52,10 +52,7 @@ struct
   exception Empty
   exception Subscript
   let empty = Nil
-  let is_empty s =
-    match s with
-        Nil -> true
-      | _ -> false
+  let is_empty = function Nil -> true | _ -> false
   let cons x s =
     Cons(x, s)
   let head s =
