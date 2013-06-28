@@ -167,3 +167,14 @@ struct
         then member x left
         else member' x right k
 end
+
+(* FiniteMap Signature *)
+module type FINITEMAP =
+sig
+  type key
+  type 'a map
+  exception NotFound
+  val empty : 'a map
+  val bind : key -> 'a map -> 'a map
+  val lookup : key -> 'a map -> 'a (* raise NotFound if key is not found *)
+end
