@@ -229,11 +229,17 @@ struct
         let nn = n - 1 in
         let left_n = (nn / 2) + (nn mod 2) in
         let right_n = nn - left_n in
-        Node(balanced x left_n,
-             x,
-             balanced x right_n)
+        let left_tree = balanced x left_n in
+        if left_n = right_n
+        then Node(left_tree,
+                  x,
+                  left_tree)
+        else Node(left_tree,
+                  x,
+                  balanced x right_n)
 end
 
+(* Exercise 2.6 *)
 (* FiniteMap Signature *)
 module type FINITEMAP =
 sig
