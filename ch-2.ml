@@ -130,7 +130,9 @@ struct
           | Greater -> member x right
 end
 
-(* Exercise 2.2 *)
+(* Exercise 2.2
+   Member check of set in 2 * h + 1 comparisons (h = height of tree)
+*)
 
 module type TWOWAY_ORDERED =
   sig
@@ -166,6 +168,70 @@ struct
         if Element.lt x k
         then member x left
         else member' x right k
+end
+
+(* Exercises 2.3 and 2.4
+   Forgive the Java-like module name :(
+*)
+module OptimizedUnbalancedTwoWaySet (Element : TWOWAY_ORDERED) : SET =
+struct
+  type elem = Element.t
+  type tree = EmptyTree | Node of tree * elem * tree
+  type set = tree
+  let empty = EmptyTree
+  let rec insert x s =
+    let rec insert' x s head =
+      match s with
+          EmptyTree -> Node(EmptyTree, x, EmptyTree)
+        | Node(left, k, right) ->
+          if Element.lt x k then Node(insert x left, k, right)
+          else if Element.eq x k then head
+          else Node(left, k, insert x right)
+    in insert' x s s
+  let rec member x s =
+    let rec member' x s cand =
+      match x, s with
+          x, EmptyTree -> if x = cand then true else false
+        | x, Node(left, k, right) ->
+          if Element.lt x k
+          then member' x left cand
+          else member' x right k
+    in match x, s with
+        _, EmptyTree -> false
+      | x, Node(left, k, right) ->
+        if Element.lt x k
+        then member x left
+        else member' x right k
+end
+
+(* Exercise 2.5 *)
+
+module type TREE =
+sig
+  type 'a tree
+  val complete 'a -> int -> 'a tree
+end
+
+module Tree =
+struct
+  type 'a tree = EmptyTree | Node of 'a tree * 'a * 'a tree
+  let rec complete x d =
+    match d with
+        1 -> Node(EmptyTree, x, EmptyTree)
+      | _ ->
+        let child = complete x (d - 1) in
+        Node(child, x, child)
+  let rec balanced x n =
+    match n with
+        0 -> EmptyTree
+      | 1 -> Node(EmptyTree, x, EmptyTree)
+      | _ ->
+        let nn = n - 1 in
+        let left_n = (nn / 2) + (nn mod 2) in
+        let right_n = nn - left_n in
+        Node(balanced x left_n,
+             x,
+             balanced x right_n)
 end
 
 (* FiniteMap Signature *)
