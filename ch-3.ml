@@ -20,7 +20,7 @@ sig
   val from_list : Elem.t list -> heap
 end
 
-module Heap (Elem : ORDERED) : HEAP =
+module Heap (Elem : ORDERED) : HEAP with type Elem.t = Elem.t =
 struct
   module Elem = Elem
   type heap = EmptyTree | Tree of int * Elem.t * heap * heap
@@ -77,7 +77,7 @@ struct
 end
 
 
-module WeightHeap (Elem : ORDERED) : HEAP =
+module WeightHeap (Elem : ORDERED) : HEAP with type Elem.t = Elem.t =
 struct
   module Elem = Elem
   type heap = EmptyTree | Tree of int * Elem.t * heap * heap
