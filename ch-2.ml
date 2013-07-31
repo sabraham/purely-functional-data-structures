@@ -179,15 +179,17 @@ struct
   type tree = EmptyTree | Node of tree * elem * tree
   type set = tree
   let empty = EmptyTree
+  exception Insert
   let rec insert x s =
-    let rec insert' x s head =
+    let rec insert' x s =
       match s with
           EmptyTree -> Node(EmptyTree, x, EmptyTree)
         | Node(left, k, right) ->
-          if Element.lt x k then Node(insert x left, k, right)
-          else if Element.eq x k then head
-          else Node(left, k, insert x right)
-    in insert' x s s
+          if Element.lt x k then Node(insert' x left, k, right)
+          else if Element.eq x k then raise Insert
+          else Node(left, k, insert' x right)
+    in try insert' x s
+      with Insert -> s
   let rec member x s =
     let rec member' x s cand =
       match x, s with
